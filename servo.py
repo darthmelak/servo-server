@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Device, Servo
 

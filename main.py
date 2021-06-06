@@ -1,22 +1,24 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 from bottle import get,post,run,route,request,template,static_file
+from servo import RanServo
 import threading
 import socket
-import time
 
-HStep = 0      #Sets the initial step length
-VStep = 0      #Sets the initial step length
+HPos = 0      #Sets the initial position
+VPos = 0      #Sets the initial position
+HStep = 0
+VStep = 0
 
 Address = ''
-start = int(time.time())
+refreshRate = 0.05
 
 @get("/")
 def index():
     global Address
     return template("index", address=Address)
 
-@route('/<filename>')
+@route("/<filename>")
 def server_static(filename):
     return static_file(filename, root='./')
 
@@ -35,20 +37,50 @@ def cmd():
         VStep = 0
         print("stop")
     elif code == "up":
-        VStep = -5
+        VStep = 1
         print("up")
     elif code == "down":
-        VStep = 5
+        VStep = -1
         print("down")
     elif code == "left":
-        HStep = 5
+        HStep = -1
         print("left")
     elif code == "right":
-        HStep = -5
+        HStep = 1
         print("right")
     return "OK"
 
+def timerfunc():
+    global HPos,VPos,HStep,VStep,HServo,VServo,refreshRate
+    
+    if(HStep != 0):
+        HPos += HStep
+        if(HPos > 90): 
+            HPos = 90
+        if(HPos < -90):
+            HPos = -90
+    HServo.toDegree(HPos)
+
+    if(VStep != 0):
+        VPos += VStep
+        if(VPos > 90): 
+            VPos = 90
+        if(VPos < -90):
+            VPos = -90
+    VServo.toDegree(VPos)
+
+    global t        #Notice: use global variable!
+    t = threading.Timer(refreshRate, timerfunc)
+    t.start()
+
 try:
+    VServo = RanServo(27)
+    HServo = RanServo(17)
+
+    t = threading.Timer(refreshRate, timerfunc)
+    t.setDaemon(True)
+    t.start()
+
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(('8.8.8.8', 80))
     Address = s.getsockname()[0]
