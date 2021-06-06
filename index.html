@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Pan-Tilt setup</title>
+    <link href="style.css" rel="stylesheet" media="screen">
+    <script src="jquery-3.6.0.slim.min.js"></script>
+    <script>
+        jQuery(function($) {
+            var isTouchDevice = "ontouchstart" in document.documentElement ? true : false
+            var BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
+            var BUTTON_UP     = isTouchDevice ? "touchend"   : "mouseup"
+            
+            $("button").bind(BUTTON_DOWN, function() {
+                fetch("/cmd", {
+                    method: "POST",
+                    body: this.id,
+                })
+            })
+
+            $("button").bind(BUTTON_UP, function() {
+                fetch("/cmd", {
+                    method: "POST",
+                    body: "stop",
+                })
+            })
+
+            $("input").change(function() {
+                var speed = this.value
+                fetch("/cmd", {
+                    method: "POST",
+                    body: JSON.stringify({ speed: speed }),
+                })
+            })
+        })
+    </script>
+</head>
+<body>
+    <div id="container" class="container">
+        <h1>Camera: {{ address }}</h1>
+
+        <img src="https://via.placeholder.com/1280x720" alt="placeholder" />
+        <!-- <img src="//{{ address }}:8080/stream/video.mjpeg" alt="stream" /> -->
+
+        <div class="controls">
+            <div class="left">
+                <button id="nv" class="nv">
+                    NV
+                </button>
+            </div>
+            <div class="right">
+                <div class="center">
+                    <button id="up">🡹</button>
+                </div>
+                <div class="center">
+                    <button id="left">🡸</button>
+                    <button id="down">🡻</button>
+                    <button id="right">🡺</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body> 
+</html>
