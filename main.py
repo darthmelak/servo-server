@@ -4,6 +4,7 @@ from bottle import get,post,run,route,request,template,static_file
 from servo import RanServo
 import threading
 import socket
+import os
 
 HPos = 0      #Sets the initial position
 VPos = 0      #Sets the initial position
@@ -30,8 +31,8 @@ def cmd():
     # speed = request.POST.get('speed')
     # print(code)
     # if(speed != None):
-
         # print(speed)
+
     if code == "stop":
         HStep = 0
         VStep = 0
@@ -48,6 +49,10 @@ def cmd():
     elif code == "right":
         HStep = 1
         print("right")
+    elif code == "nvstart":
+        os.system("nvstart")
+    elif code == "nvstop":
+        os.system("nvstop")
     return "OK"
 
 def timerfunc():

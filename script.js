@@ -7,6 +7,7 @@ jQuery(function($) {
             live: $('img').data('livesrc'),
         },
     }
+    var nv = true
 
     var isTouchDevice = "ontouchstart" in document.documentElement ? true : false
     var BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
@@ -29,6 +30,16 @@ jQuery(function($) {
     $("button#start").on("click", function () {
         img.isLive = !img.isLive
         img.$el.attr('src', img.isLive ? img.url.live : img.url.ph)
+        $(this)[img.isLive ? "addClass" : "removeClass"]("active")
+    })
+
+    $("button#nv").on("click", function () {
+        nv = !nv
+        fetch("/cmd", {
+            method: "POST",
+            body: nv ? "nvstart" : "nvstop",
+        })
+        $(this)[nv ? "addClass" : "removeClass"]("active")
     })
 
     $("input").change(function() {
