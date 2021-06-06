@@ -9,30 +9,28 @@
     <script src="script.js"></script>
 </head>
 <body>
-    <div id="container" class="container">
-        <h1>Camera: {{ address }}</h1>
+    <h1>Camera: {{ address }}</h1>
 
-        <img src="http://via.placeholder.com/1280x720" data-livesrc="//{{ address }}:8080/stream/video.mjpeg" alt="placeholder" />
-        <!-- <img src="//{{ address }}:8080/stream/video.mjpeg" alt="stream" /> -->
+    <img src="http://via.placeholder.com/1280x720" data-livesrc="//{{ address }}:8080/stream/video.mjpeg" alt="placeholder" />
+    <!-- <img src="//{{ address }}:8080/stream/video.mjpeg" alt="stream" /> -->
 
-        <div class="controls">
-            <div class="left">
-                <button id="start">
-                    ▶
-                </button>
-                <button id="nv" class="active">
-                    NV
-                </button>
+    <div class="controls">
+        <div class="left">
+            <button id="start">
+                ▶
+            </button>
+            <button id="nv" class="{{ "active" if nv else "" }}">
+                NV
+            </button>
+        </div>
+        <div class="right">
+            <div class="center">
+                <button id="up" class="dir">△</button>
             </div>
-            <div class="right">
-                <div class="center">
-                    <button id="up" class="dir">🡹</button>
-                </div>
-                <div class="center">
-                    <button id="left" class="dir">🡸</button>
-                    <button id="down" class="dir">🡻</button>
-                    <button id="right" class="dir">🡺</button>
-                </div>
+            <div class="center">
+                <button id="left" class="dir">◁</button>
+                <button id="down" class="dir">▽</button>
+                <button id="right" class="dir">▷</button>
             </div>
         </div>
     </div>

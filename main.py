@@ -10,14 +10,15 @@ HPos = 0      #Sets the initial position
 VPos = 0      #Sets the initial position
 HStep = 0
 VStep = 0
+nv = True
 
 Address = ''
 refreshRate = 0.05
 
 @get("/")
 def index():
-    global Address
-    return template("index", address=Address)
+    global Address,nv
+    return template("index", address=Address, nv=nv)
 
 @route("/<filename>")
 def server_static(filename):
@@ -25,7 +26,7 @@ def server_static(filename):
 
 @post("/cmd")
 def cmd():
-    global HStep,VStep
+    global HStep,VStep,nv
     code = request.body.read().decode()
     print ("code ", code)
     # speed = request.POST.get('speed')
@@ -50,8 +51,10 @@ def cmd():
         HStep = 1
         print("right")
     elif code == "nvstart":
+        nv = True
         os.system("nvstart")
     elif code == "nvstop":
+        nv = False
         os.system("nvstop")
     return "OK"
 
