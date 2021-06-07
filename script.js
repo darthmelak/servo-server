@@ -1,10 +1,10 @@
 jQuery(function($) {
     var img = {
-        $el: $('img'),
+        $el: $("img"),
         isLive: false,
         url: {
-            ph: $('img').attr('src'),
-            live: $('img').data('livesrc'),
+            ph: $("img").attr("src"),
+            live: $("img").data("livesrc").replace(/\$host\$/, window.location.hostname),
         },
     }
     var nv = true
@@ -29,7 +29,7 @@ jQuery(function($) {
 
     $("button#start").on("click", function () {
         img.isLive = !img.isLive
-        img.$el.attr('src', img.isLive ? img.url.live : img.url.ph)
+        img.$el.attr("src", img.isLive ? img.url.live : img.url.ph)
         $(this)[img.isLive ? "addClass" : "removeClass"]("active")
     })
 
