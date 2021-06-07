@@ -7,7 +7,7 @@ jQuery(function($) {
             live: $("img").data("livesrc").replace(/\$host\$/, window.location.hostname),
         },
     }
-    var nv = true
+    var nv = $("button#nv").is('.active')
 
     var isTouchDevice = "ontouchstart" in document.documentElement ? true : false
     var BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
