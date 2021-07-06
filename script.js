@@ -8,6 +8,7 @@ jQuery(function($) {
         },
     }
     var nv = $("button#nv").is('.active')
+    var led = $("button#led").is('.active')
 
     var isTouchDevice = "ontouchstart" in document.documentElement ? true : false
     var BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
@@ -40,6 +41,15 @@ jQuery(function($) {
             body: nv ? "nvstart" : "nvstop",
         })
         $(this)[nv ? "addClass" : "removeClass"]("active")
+    })
+
+    $("button#led").on("click", function () {
+        led = !led
+        fetch("/cmd", {
+            method: "POST",
+            body: "ledswitch",
+        })
+        $(this)[led ? "addClass" : "removeClass"]("active")
     })
 
     $("input").change(function() {

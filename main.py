@@ -2,6 +2,8 @@
 # -*- coding:utf-8 -*-
 from bottle import get,post,run,route,request,template,static_file
 from servo import RanServo
+from gpiozero.pins.pigpio import PiGPIOFactory
+from gpiozero import Device, OutputDevice
 import threading
 import socket
 import os
@@ -11,14 +13,15 @@ VPos = 0      #Sets the initial position
 HStep = 0
 VStep = 0
 nv = True
+led = False
 
 Address = ''
 refreshRate = 0.05
 
 @get("/")
 def index():
-    global Address,nv
-    return template("index", address=Address, nv=nv)
+    global Address,nv,led
+    return template("index", address=Address, nv=nv, led=led)
 
 @route("/<filename>")
 def server_static(filename):
@@ -26,7 +29,7 @@ def server_static(filename):
 
 @post("/cmd")
 def cmd():
-    global HStep,VStep,nv
+    global HStep,VStep,nv,led,LedSwitch
     code = request.body.read().decode()
     print ("code ", code)
     # speed = request.POST.get('speed')
@@ -56,6 +59,9 @@ def cmd():
     elif code == "nvstop":
         nv = False
         os.system("nvstop")
+    elif code == "ledswitch":
+        LedSwitch.toggle()
+        led = not led
     return "OK"
 
 def timerfunc():
@@ -82,6 +88,9 @@ def timerfunc():
     t.start()
 
 try:
+    Device.pin_factory = PiGPIOFactory()
+    LedSwitch = OutputDevice(22)
+
     VServo = RanServo(17)
     HServo = RanServo(27)
 
