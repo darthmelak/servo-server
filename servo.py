@@ -2,8 +2,8 @@ from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Device, Servo
 
 corrections = {
-    17: 0.24,
-    27: 0.33
+    27: 0.24,
+    17: 0.33
 }
 
 class RanServo:

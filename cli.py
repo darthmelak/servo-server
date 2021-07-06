@@ -6,7 +6,7 @@ import sys
 
 def main(argv):
     try:
-        gpio = 17 if argv[0] == 'v' else 27
+        gpio = 27 if argv[0] == 'v' else 17
         degree = int(argv[1])
 
         servo = RanServo(gpio)

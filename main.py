@@ -82,8 +82,8 @@ def timerfunc():
     t.start()
 
 try:
-    VServo = RanServo(27)
-    HServo = RanServo(17)
+    VServo = RanServo(17)
+    HServo = RanServo(27)
 
     t = threading.Timer(refreshRate, timerfunc)
     t.setDaemon(True)
