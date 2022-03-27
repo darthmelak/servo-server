@@ -192,19 +192,21 @@
             var BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
             var BUTTON_UP     = isTouchDevice ? "touchend"   : "mouseup"
 
-            $DIRbtns.addEventListener(BUTTON_DOWN, function (ev) {
-                fetch("/cmd", {
-                    method: "POST",
-                    body: ev.target.id,
+            for (let $btn of $DIRbtns) {
+                $btn.addEventListener(BUTTON_DOWN, function (ev) {
+                    fetch("/cmd", {
+                        method: "POST",
+                        body: ev.target.id,
+                    })
                 })
-            })
 
-            $DIRbtns.addEventListener(BUTTON_UP, function (ev) {
-                fetch("/cmd", {
-                    method: "POST",
-                    body: "stop",
+                $btn.addEventListener(BUTTON_UP, function (ev) {
+                    fetch("/cmd", {
+                        method: "POST",
+                        body: "stop",
+                    })
                 })
-            })
+            }
 
             $STRTbtn.addEventListener("click", function (ev) {
                 img.isLive = !img.isLive
