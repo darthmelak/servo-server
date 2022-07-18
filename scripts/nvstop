@@ -1,0 +1,2 @@
+#!/bin/sh
+rpi3-gpiovirtbuf s 134 1

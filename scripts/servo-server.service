@@ -1,0 +1,11 @@
+[Unit]
+Description=Run python server for servo control
+[Service]
+WorkingDirectory=/home/pi/servo
+ExecStart=/usr/bin/python /home/pi/servo/main.py
+User=pi
+Type=simple
+RestartSec=2
+Restart=always
+[Install]
+WantedBy=multi-user.target
