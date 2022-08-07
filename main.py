@@ -65,14 +65,14 @@ def cmd():
         if(not nv):
             nv = True
             if(piZero):
-                GPIO.output(40, GPIO.HIGH)
+                GPIO.output(40, GPIO.LOW)
             else:
                 os.system("nvstart")
     elif code == "nvstop":
         if(nv):
             nv = False
             if(piZero):
-                GPIO.output(40, GPIO.LOW)
+                GPIO.output(40, GPIO.HIGH)
             else:
                 os.system("nvstop")
     elif code == "ledswitch":
@@ -114,7 +114,7 @@ try:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(40, GPIO.OUT)
-        GPIO.output(40, GPIO.HIGH)
+        GPIO.output(40, GPIO.LOW)
 
     t = threading.Timer(refreshRate, timerfunc)
     t.setDaemon(True)
