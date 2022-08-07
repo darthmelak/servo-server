@@ -4,9 +4,17 @@ from bottle import get,post,run,route,request,template,static_file
 from servo import RanServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Device, OutputDevice
+import RPi.GPIO as GPIO
 import threading
 import socket
 import os
+
+def is_pizero():
+    with open('/proc/device-tree/model') as f:
+        model = f.read()
+    return model.find("Zero W") != -1
+
+piZero = is_pizero()
 
 HPos = 0      #Sets the initial position
 VPos = 0      #Sets the initial position
@@ -54,11 +62,19 @@ def cmd():
         HStep = 1
         print("right")
     elif code == "nvstart":
-        nv = True
-        os.system("nvstart")
+        if(not nv):
+            nv = True
+            if(piZero):
+                GPIO.output(40, GPIO.HIGH)
+            else:
+                os.system("nvstart")
     elif code == "nvstop":
-        nv = False
-        os.system("nvstop")
+        if(nv):
+            nv = False
+            if(piZero):
+                GPIO.output(40, GPIO.LOW)
+            else:
+                os.system("nvstop")
     elif code == "ledswitch":
         LedSwitch.toggle()
         led = not led
@@ -94,6 +110,12 @@ try:
     VServo = RanServo(17)
     HServo = RanServo(27)
 
+    if (piZero):
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(40, GPIO.OUT)
+        GPIO.output(40, GPIO.HIGH)
+
     t = threading.Timer(refreshRate, timerfunc)
     t.setDaemon(True)
     t.start()
@@ -103,6 +125,7 @@ try:
     Address = s.getsockname()[0]
 
     run(host=Address, port="8000")
-except:
+except Exception as err:
     print("\nServer exiting.")
+    print(err)
     exit()
