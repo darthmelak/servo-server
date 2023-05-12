@@ -19,7 +19,7 @@ def main(argv):
             device.off()
             print('GPIO: %d off' % (gpio))
 
-        input('Press any kay to stop.')
+        input('Press any key to stop.')
 
     except IndexError:
         print('gpio.py <nr> <state>')

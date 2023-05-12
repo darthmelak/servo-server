@@ -8,11 +8,16 @@ import RPi.GPIO as GPIO
 import threading
 import socket
 import os
+import sys
 
 def is_pizero():
     with open('/proc/device-tree/model') as f:
         model = f.read()
     return model.find("Zero W") != -1
+
+def loadStatic(file):
+    with open("static/" + file) as f:
+        return f.read()
 
 piZero = is_pizero()
 
@@ -23,17 +28,21 @@ VStep = 0
 nv = True
 led = False
 
+devMode = True if (len(sys.argv) > 1 and sys.argv[1].find("dev") == 0) else False
 Address = ''
 refreshRate = 0.05
 
+style = loadStatic("style.css")
+script = loadStatic("script.js")
+
 @get("/")
 def index():
-    global Address,nv,led
-    return template("index", address=Address, nv=nv, led=led)
+    global Address,nv,led,style,script,devMode
+    return template("template/index", address=Address, nv=nv, led=led, style=style, script=script, dev=devMode)
 
 @route("/<filename>")
 def server_static(filename):
-    return static_file(filename, root='./')
+    return static_file(filename, root='static/')
 
 @post("/cmd")
 def cmd():
@@ -50,10 +59,10 @@ def cmd():
         VStep = 0
         print("stop")
     elif code == "up":
-        VStep = 1
+        VStep = -1
         print("up")
     elif code == "down":
-        VStep = -1
+        VStep = 1
         print("down")
     elif code == "left":
         HStep = -1
@@ -124,7 +133,7 @@ try:
     s.connect(('8.8.8.8', 80))
     Address = s.getsockname()[0]
 
-    run(host=Address, port="8000")
+    run(host=Address, port="8000", debug=devMode)
 except Exception as err:
     print("\nServer exiting.")
     print(err)
