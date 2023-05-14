@@ -28,7 +28,7 @@ VStep = 0
 nv = True
 led = False
 
-devMode = True if (len(sys.argv) > 1 and sys.argv[1].find("dev") == 0) else False
+devMode = True if (len(sys.argv) > 1 and sys.argv[1] == "dev") else False
 Address = ''
 refreshRate = 0.05
 
@@ -49,10 +49,6 @@ def cmd():
     global HStep,VStep,nv,led,LedSwitch
     code = request.body.read().decode()
     print ("code ", code)
-    # speed = request.POST.get('speed')
-    # print(code)
-    # if(speed != None):
-        # print(speed)
 
     if code == "stop":
         HStep = 0
@@ -88,6 +84,15 @@ def cmd():
         LedSwitch.toggle()
         led = not led
     return "OK"
+
+@post("/speed")
+def speed():
+    global HStep,VStep
+    req = request.json
+    HStep = req.get("stepX")
+    VStep = req.get("stepY")
+
+    return "{H} {V}".format(H = HStep, V = VStep)
 
 def timerfunc():
     global HPos,VPos,HStep,VStep,HServo,VServo,refreshRate

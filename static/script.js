@@ -1,6 +1,6 @@
 (function (d) {
     $img = d.querySelector("img")
-    var img = {
+    const img = {
         $el: $img,
         isLive: false,
         url: {
@@ -8,17 +8,33 @@
             live: $img.dataset.livesrc.replace(/\$host\$/, window.location.hostname),
         },
     }
-    var $STRTbtn = d.querySelector("button#start")
-    var $NVbtn = d.querySelector("button#nv")
-    var $LEDbtn = d.querySelector("button#led")
-    var $DIRbtns = d.querySelectorAll("button.dir")
 
-    var nv = $NVbtn.classList.contains('active')
-    var led = $LEDbtn.classList.contains('active')
+    const STEP = 30
 
-    var isTouchDevice = "ontouchstart" in d.documentElement ? true : false
-    var BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
-    var BUTTON_UP     = isTouchDevice ? "touchend"   : "mouseup"
+    let offsetTop = 0
+    let offsetLeft = 0
+    let startX = 0
+    let startY = 0
+    let started = false
+    let prevStepX = 0
+    let prevStepY = 0
+
+    const $STRTbtn = d.querySelector("button#start")
+    const $NVbtn = d.querySelector("button#nv")
+    const $LEDbtn = d.querySelector("button#led")
+    const $DIRbtns = d.querySelectorAll("button.dir")
+    const $TouchO = d.querySelector(".touch-overlay")
+    const $TouchM = d.querySelector(".touch-marker")
+    const $canvas = d.querySelector(".touch-overlay canvas")
+    const ctx = $canvas.getContext("2d")
+
+    let nv = $NVbtn.classList.contains("active")
+    let led = $LEDbtn.classList.contains("active")
+
+    const isTouchDevice = "ontouchstart" in d.documentElement ? true : false
+    const BUTTON_DOWN   = isTouchDevice ? "touchstart" : "mousedown"
+    const BUTTON_UP     = isTouchDevice ? "touchend"   : "mouseup"
+    const MOVE          = isTouchDevice ? "touchmove"  : "mousemove"
 
     for (let $btn of $DIRbtns) {
         $btn.addEventListener(BUTTON_DOWN, function (ev) {
@@ -58,5 +74,79 @@
             body: "ledswitch",
         })
         ev.target.classList[led ? "add" : "remove"]("active")
+    })
+
+    window.addEventListener('resize', resizectx, false)
+    function resizectx() {
+        $canvas.width = $TouchO.offsetWidth
+        $canvas.height = $TouchO.offsetHeight
+        offsetLeft = $TouchO.offsetLeft
+        offsetTop = $TouchO.offsetTop
+    }
+    resizectx()
+
+    function moveMarker({x, y}) {
+        $TouchM.style.left = `${x}px`
+        $TouchM.style.top = `${y}px`
+    }
+
+    function getCoords(event) {
+        let ev = event
+        if (event instanceof TouchEvent) {
+            ev = event.touches[0]
+        }
+
+        return {
+            x: ev.clientX - offsetLeft,
+            y: ev.clientY - offsetTop,
+        }
+    }
+
+    $TouchO.addEventListener(BUTTON_DOWN, function (ev) {
+        const c = getCoords(ev)
+        startX = c.x
+        startY = c.y
+        moveMarker(c)
+        started = true
+        $TouchM.classList.add("active")
+    })
+
+    $TouchO.addEventListener(BUTTON_UP, function (ev) {
+        started = false
+        ctx.reset()
+        $TouchM.classList.remove("active")
+        fetch("/cmd", {
+            method: "POST",
+            body: "stop",
+        })
+    })
+
+    $TouchO.addEventListener(MOVE, function (ev) {
+        ev.preventDefault()
+        if (started) {
+            const c = getCoords(ev)
+            ctx.reset()
+            ctx.strokeStyle = "#FFFF00"
+            ctx.beginPath()
+            ctx.moveTo(startX, startY)
+            ctx.lineTo(c.x, c.y)
+            ctx.stroke()
+            ctx.closePath()
+
+            const stepX = Math.round((c.x - startX) / STEP)
+            const stepY = Math.round((c.y - startY) / STEP)
+
+            if (stepX !== prevStepX || stepY !== prevStepY) {
+                fetch("/speed", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({stepX, stepY}),
+                })
+            }
+
+            if (stepX !== prevStepX) { prevStepX = stepX }
+            if (stepY !== prevStepY) { prevStepY = stepY }
+        }
+
     })
 })(document)
