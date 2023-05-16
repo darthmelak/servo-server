@@ -11,15 +11,17 @@ import os
 import sys
 
 def is_pizero():
+    global model
     with open('/proc/device-tree/model') as f:
         model = f.read()
-    return model.find("Zero W") != -1
+    return model.find("Zero W") != -1 or model.find("Pi 2") != -1
 
 def loadStatic(file):
     with open("static/" + file) as f:
         return f.read()
 
 piZero = is_pizero()
+LEDpin = 40 if model.find("Pi 2") == -1 else 32
 
 HPos = 0      #Sets the initial position
 VPos = 0      #Sets the initial position
@@ -70,14 +72,14 @@ def cmd():
         if(not nv):
             nv = True
             if(piZero):
-                GPIO.output(40, GPIO.LOW)
+                GPIO.output(LEDpin, GPIO.LOW)
             else:
                 os.system("nvstart")
     elif code == "nvstop":
         if(nv):
             nv = False
             if(piZero):
-                GPIO.output(40, GPIO.HIGH)
+                GPIO.output(LEDpin, GPIO.HIGH)
             else:
                 os.system("nvstop")
     elif code == "ledswitch":
@@ -127,8 +129,8 @@ try:
     if (piZero):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(40, GPIO.OUT)
-        GPIO.output(40, GPIO.LOW)
+        GPIO.setup(LEDpin, GPIO.OUT)
+        GPIO.output(LEDpin, GPIO.LOW)
 
     t = threading.Timer(refreshRate, timerfunc)
     t.setDaemon(True)
