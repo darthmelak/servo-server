@@ -54,7 +54,9 @@ h1:focus {
 img {
     display: block;
     margin: 0 auto;
-    height: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
     max-width: 100vw;
     max-height: 100vh;
     pointer-events: none;
@@ -141,8 +143,8 @@ button.active {
     --edge: 7rem;
     display: block;
     position: absolute;
-    top: var(--edge);
-    bottom: var(--edge);
+    top: calc(var(--edge) / 3);
+    bottom: calc(var(--edge) / 3);
     left: var(--edge);
     right: var(--edge);
     background-color: rgba(0,0,0,0);

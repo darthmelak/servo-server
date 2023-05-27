@@ -121,7 +121,7 @@
         })
     })
 
-    $TouchO.addEventListener(MOVE, function (ev) {
+    const onMove = function (ev) {
         ev.preventDefault()
         if (started) {
             const c = getCoords(ev)
@@ -147,6 +147,7 @@
             if (stepX !== prevStepX) { prevStepX = stepX }
             if (stepY !== prevStepY) { prevStepY = stepY }
         }
+    }
 
-    })
+    $TouchO.addEventListener(MOVE, _.throttle(onMove, 250, {leading: true, trailing: true}))
 })(document)
