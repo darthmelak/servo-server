@@ -23,6 +23,7 @@
     const $NVbtn = d.querySelector("button#nv")
     const $LEDbtn = d.querySelector("button#led")
     const $DIRbtns = d.querySelectorAll("button.dir")
+    const $Gyrobtn = d.querySelector("button#gyro")
     const $TouchO = d.querySelector(".touch-overlay")
     const $TouchM = d.querySelector(".touch-marker")
     const $canvas = d.querySelector(".touch-overlay canvas")

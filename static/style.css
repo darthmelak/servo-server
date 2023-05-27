@@ -139,6 +139,13 @@ button.active {
     right: 0;
 }
 
+.controls.middle {
+    margin: 0 auto 1rem;
+    align-items: flex-end;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .touch-overlay {
     --edge: 7rem;
     display: block;
