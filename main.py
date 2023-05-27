@@ -4,6 +4,7 @@ from bottle import get,post,run,route,request,template,static_file
 from servo import RanServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Device, OutputDevice
+from adafruit_servokit import ServoKit
 import RPi.GPIO as GPIO
 import threading
 import socket
@@ -22,9 +23,12 @@ def loadStatic(file):
 
 piZero = is_pizero()
 LEDpin = 40 if model.find("Pi 2") == -1 else 32
+kit = ServoKit(channels=16)
 
-HPos = 0      #Sets the initial position
-VPos = 0      #Sets the initial position
+max = 180
+min = 0
+HPos = 90      #Sets the initial position
+VPos = 90      #Sets the initial position
 HStep = 0
 VStep = 0
 nv = True
@@ -96,35 +100,46 @@ def speed():
 
     return "{H} {V}".format(H = HStep, V = VStep)
 
+@post("/to_position")
+def position():
+    global HPos,VPos
+    req = request.json
+    HPos = req.get("rotX")
+    VPos = req.get("rotY")
+
+    return "{H} {V}".format(H = HPos, V = VPos)
+
 def timerfunc():
-    global HPos,VPos,HStep,VStep,HServo,VServo,refreshRate
+    global HPos,VPos,HStep,VStep,HServo,VServo,refreshRate,max,min
     
     if(HStep != 0):
         HPos += HStep
-        if(HPos > 90): 
-            HPos = 90
-        if(HPos < -90):
-            HPos = -90
-    HServo.toDegree(HPos)
+    if(HPos > max):
+        HPos = max
+    if(HPos < min):
+        HPos = min
+    HServo.angle = HPos
 
     if(VStep != 0):
         VPos += VStep
-        if(VPos > 90): 
-            VPos = 90
-        if(VPos < -90):
-            VPos = -90
-    VServo.toDegree(VPos)
+    if(VPos > max):
+        VPos = max
+    if(VPos < min):
+        VPos = min
+    VServo.angle = VPos
 
     global t        #Notice: use global variable!
     t = threading.Timer(refreshRate, timerfunc)
     t.start()
 
 try:
-    Device.pin_factory = PiGPIOFactory()
+    #Device.pin_factory = PiGPIOFactory()
     LedSwitch = OutputDevice(22)
 
-    VServo = RanServo(17)
-    HServo = RanServo(27)
+    # VServo = RanServo(17)
+    # HServo = RanServo(27)
+    VServo = kit.servo[1]
+    HServo = kit.servo[0]
 
     if (piZero):
         GPIO.setwarnings(False)
