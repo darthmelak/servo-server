@@ -8,6 +8,7 @@
             live: $img.dataset.livesrc.replace(/\$host\$/, window.location.hostname),
         },
     }
+    const headers = { "Content-Type": "application/json" }
 
     const STEP = 30
 
@@ -140,7 +141,7 @@
             if (stepX !== prevStepX || stepY !== prevStepY) {
                 fetch("/speed", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers,
                     body: JSON.stringify({stepX, stepY}),
                 })
             }
@@ -151,4 +152,36 @@
     }
 
     $TouchO.addEventListener(MOVE, _.throttle(onMove, 250, {leading: true, trailing: true}))
+
+    // check for gyroscope support
+    if (window.DeviceOrientationEvent) {
+        $Gyrobtn.addEventListener("click", function (ev) {
+            if (window.DeviceOrientationEvent.requestPermission) {
+                window.DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === "granted") {
+                            window.addEventListener("deviceorientation", handleOrientation, true)
+                            ev.target.classList.add("active")
+                        }
+                    })
+                    .catch(console.error)
+            } else {
+                window.addEventListener("deviceorientation", handleOrientation, true)
+                ev.target.classList.add("active")
+            }
+        })
+    }
+
+    // handleorientation
+    function handleOrientation(event) {
+        const { gamma, beta } = event
+        const rotX = gamma
+        const rotY = beta
+        fetch("/to_position", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({rotX, rotY}),
+        })
+    }
+
 })(document)
