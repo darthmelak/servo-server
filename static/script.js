@@ -19,6 +19,10 @@
     let started = false
     let prevStepX = 0
     let prevStepY = 0
+    let gyroActive = false
+    let lastAlpha = 0
+    let lastBeta = 0
+    let lastGamma = 0
 
     const $STRTbtn = d.querySelector("button#start")
     const $NVbtn = d.querySelector("button#nv")
@@ -153,35 +157,45 @@
 
     $TouchO.addEventListener(MOVE, _.throttle(onMove, 250, {leading: true, trailing: true}))
 
-    // check for gyroscope support
-    if (window.DeviceOrientationEvent) {
-        $Gyrobtn.addEventListener("click", function (ev) {
-            if (window.DeviceOrientationEvent.requestPermission) {
-                window.DeviceOrientationEvent.requestPermission()
-                    .then(response => {
-                        if (response === "granted") {
-                            window.addEventListener("deviceorientation", handleOrientation, true)
-                            ev.target.classList.add("active")
-                        }
-                    })
-                    .catch(console.error)
-            } else {
-                window.addEventListener("deviceorientation", handleOrientation, true)
-                ev.target.classList.add("active")
-            }
-        })
-    }
+    const throttledOrientation = _.throttle(handleOrientation, 100, {leading: true, trailing: true})
 
-    // handleorientation
+    if (window.DeviceOrientationEvent) {
+        // window.addEventListener('deviceorientation', handleOrientation, true)
+
+        $Gyrobtn.addEventListener(BUTTON_DOWN, function () {
+            $Gyrobtn.classList.add('active')
+            gyroActive = true
+        })
+        $Gyrobtn.addEventListener(BUTTON_UP, function () {
+            $Gyrobtn.classList.remove('active')
+            gyroActive = false
+        })
+    } else {
+        // $Gyrobtn.classList.add('hidden')
+    }
+    $Gyrobtn.classList.add('hidden')
+
     function handleOrientation(event) {
-        const { gamma, beta } = event
-        const rotX = gamma
-        const rotY = beta
+        const { gamma, beta, alpha } = event
+        if (!gyroActive) {
+            lastAlpha = alpha
+            lastBeta = beta
+            lastGamma = gamma
+
+            // console.log(alpha, beta, gamma)
+        } else {
+            let heading = alpha - lastAlpha
+            let roll = beta - lastBeta
+            let pitch = gamma - lastGamma
+
+            // console.log(heading, roll, pitch)
+        }
+        /*
         fetch("/to_position", {
             method: "POST",
             headers,
             body: JSON.stringify({rotX, rotY}),
         })
+        */
     }
-
 })(document)
