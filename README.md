@@ -19,7 +19,7 @@ width = 1280
 height = 720  
 
 ```
-pip install bottle
+pip3 install bottle adafruit-circuitpython-servokit
 ```
 
 Edit scripts/servor-server.service with working dir/path/user

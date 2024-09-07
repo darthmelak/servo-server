@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 from bottle import get,post,run,route,request,template,static_file
-from servo import RanServo
-from gpiozero.pins.pigpio import PiGPIOFactory
+# from servo import RanServo
+# from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import Device, OutputDevice
 from adafruit_servokit import ServoKit
 import RPi.GPIO as GPIO
